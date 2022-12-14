@@ -6,9 +6,9 @@ def solution(n, t, m, p):
         number = num
         res = ''
         while number > 0:
-            res += str(numbers[number % n])
+            res = str(numbers[number % n]) + res
             number //= n
-        result += res[::-1]
+        result += res
         num += 1
     answer = ''
     for i in range(t):
