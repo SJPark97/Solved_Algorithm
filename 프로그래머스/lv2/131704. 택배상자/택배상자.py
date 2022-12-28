@@ -1,35 +1,25 @@
-
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
 def solution(order):
     answer = 0
-    stacks = []
-    N = len(order)
-    i = 1
-    idx = 0
-    while i < N+1:
-        stacks.append(i)
-        while stacks[-1] == order[idx]:
-            idx += 1
-            stacks.pop()
-            if len(stacks) == 0:
+    sub_belt = []
+    n = 0
+
+    def chk_belt():
+        nonlocal answer, n
+        while sub_belt:
+            if sub_belt[-1] != order[n]:
                 break
-        i += 1
+            else:
+                sub_belt.pop()
+                answer += 1
+                n += 1
 
+    for box in range(1, len(order) + 1):
+        chk_belt()
+        if box == order[n]:
+            answer += 1
+            n += 1
+            continue
+        sub_belt.append(box)
+    chk_belt()
 
-    return idx
+    return answer
