@@ -1,7 +1,9 @@
+from math import sqrt
+
 def solution(r1, r2):
-    answer = 1
-    for r in range(1, r2):
-        y1 = -(-((r1 ** 2 - r ** 2) ** 0.5) // 1) if r1 > r else 0
-        y2 = int((r2 ** 2 - r ** 2) ** 0.5)
-        answer += y2 - y1 + 1
-    return answer * 4
+    quar = 0
+    for i in range(0, r1):
+        quar += int(sqrt(r2**2 - i**2)) - int(sqrt(r1**2 - i**2 - 1))
+    for i in range(r1, r2):
+        quar += int(sqrt(r2**2 - i**2))
+    return quar * 4
