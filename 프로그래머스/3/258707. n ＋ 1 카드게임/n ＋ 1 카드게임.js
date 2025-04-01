@@ -20,7 +20,7 @@ function solution(coin, cards) {
     let availableTwoCoinPairs = 0;
 
     while (remainingCoins > 0) {
-        if (currentRound > totalRounds) {
+        if (currentRound >= totalRounds) {
             currentRound = totalRounds;
             break;
         }
