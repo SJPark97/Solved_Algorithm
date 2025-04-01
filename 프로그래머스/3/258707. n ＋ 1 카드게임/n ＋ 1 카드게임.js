@@ -1,59 +1,67 @@
 function solution(coin, cards) {
-    let answer = 1;
-    const gameSum = cards.length + 1;
-    const cardsInfoSet = new Set();
+    const totalRounds = cards.length / 3 + 1;
+    const targetSum = cards.length + 1;
+    let currentRound = 1;
+
+    const handSet = new Set();
     for (let i = 0; i < cards.length / 3; i++) {
         const card = cards[i];
-        cardsInfoSet.add(card);
-        if (cardsInfoSet.has(gameSum - card)) {
-            answer += 1;
+        handSet.add(card);
+        if (handSet.has(targetSum - card)) {
+            currentRound += 1;
         }
     }
-    let coins = coin;
-    let getCardsStartIndex = cards.length / 3;
-    let getCardsEndIndex = cards.length / 3 + 2 * answer;
-    const roundCardsInfoSet = new Set();
-    let getRoundsForOneCoin = 0;
-    let getRoundsForTwoCoin = 0;
-    while (coins > 0) {
-        if (answer > cards.length / 3 + 1) {
-            answer = cards.length / 3 + 1;
-            break
+
+    let remainingCoins = coin;
+    let drawStartIndex = cards.length / 3;
+    let drawEndIndex = drawStartIndex + 2 * currentRound;
+    const drawnCardsSet = new Set();
+    let availableOneCoinPairs = 0;
+    let availableTwoCoinPairs = 0;
+
+    while (remainingCoins > 0) {
+        if (currentRound > totalRounds) {
+            currentRound = totalRounds;
+            break;
         }
-        for (let i = getCardsStartIndex; i < getCardsEndIndex; i++) {
+
+        for (let i = drawStartIndex; i < drawEndIndex; i++) {
+            if (i >= cards.length) break;
+
             const card = cards[i];
-            if (i > cards.length) {
-                break
+            drawnCardsSet.add(card);
+
+            if (handSet.has(targetSum - card)) {
+                availableOneCoinPairs += 1;
             }
-            roundCardsInfoSet.add(card);
-            if (cardsInfoSet.has(gameSum - card)) {
-                getRoundsForOneCoin += 1;
-            }
-            if (roundCardsInfoSet.has(gameSum - card)) {
-                getRoundsForTwoCoin += 1;
+            if (drawnCardsSet.has(targetSum - card)) {
+                availableTwoCoinPairs += 1;
             }
         }
-        getCardsStartIndex = getCardsEndIndex;
-        if (getRoundsForOneCoin > 0) {
-            if (getRoundsForOneCoin >= coins) {
-                answer += coins;
-                coins = 0;
+
+        drawStartIndex = drawEndIndex;
+
+        if (availableOneCoinPairs > 0) {
+            if (availableOneCoinPairs >= remainingCoins) {
+                currentRound += remainingCoins;
+                remainingCoins = 0;
             } else {
-                coins -= getRoundsForOneCoin;
-                getCardsEndIndex += 2 * getRoundsForOneCoin;
-                answer += getRoundsForOneCoin;
-                getRoundsForOneCoin = 0;
+                remainingCoins -= availableOneCoinPairs;
+                drawEndIndex += 2 * availableOneCoinPairs;
+                currentRound += availableOneCoinPairs;
+                availableOneCoinPairs = 0;
             }
         } else {
-            if (getRoundsForTwoCoin > 0 && coins >= 2) {
-                coins -= 2;
-                getRoundsForTwoCoin -= 1;
-                answer += 1;
-                getCardsEndIndex += 2
+            if (availableTwoCoinPairs > 0 && remainingCoins >= 2) {
+                remainingCoins -= 2;
+                availableTwoCoinPairs -= 1;
+                currentRound += 1;
+                drawEndIndex += 2;
             } else {
-                break
+                break;
             }
         }
     }
-    return answer;
+
+    return currentRound;
 }
