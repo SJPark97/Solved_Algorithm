@@ -1,34 +1,41 @@
 function solution(diffs, times, limit) {
-    const calculateTimeBySkillLevel = (level) => {
-        let solvingTime = 0;
+    const calculateTotalTime = (skillLevel) => {
+        let totalTime = 0;
+        let previousTime = 0;
+
         for (let i = 0; i < times.length; i++) {
-            const diff = diffs[i];
-            const time = times[i];
-            if (diff <= level) {
-                solvingTime += time;
+            const difficulty = diffs[i];
+            const timeCur = times[i];
+            const timePrev = previousTime;
+
+            if (difficulty <= skillLevel) {
+                totalTime += timeCur;
             } else {
-                if (i > 0) {
-                    solvingTime += (times[i - 1] + time) * (diff - level) + time;
-                } else {
-                    solvingTime += time * (diff - level) + time;
-                }
+                totalTime += (timePrev + timeCur) * (difficulty - skillLevel) + timeCur;
             }
-            if (solvingTime > limit) {
+
+            if (totalTime > limit) {
+                break;
+            }
+
+            previousTime = timeCur;
+        }
+        return totalTime;
+    };
+
+    let maxFailedSkillLevel = 0;
+    for (let unit = 10000; unit >= 1; unit /= 10) {
+        for (let digit = 9; digit > 0; digit--) {
+            const skillLevel = maxFailedSkillLevel + unit * digit;
+            const totalTime = calculateTotalTime(skillLevel);
+
+            if (totalTime > limit) {
+                maxFailedSkillLevel += unit * digit;
                 break;
             }
         }
-        return solvingTime;
     }
-    let answer = 0;
-    for (let i = 10000; i >= 1; i /= 10) {
-        for (let j = 9; j > 0; j--) {
-            const level = answer + i * j;
-            const solvingTime = calculateTimeBySkillLevel(level);
-            if (solvingTime > limit) {
-                answer += i * j;
-                break;
-            }
-        }
-    }
-    return answer + 1;
+    
+    const answer = maxFailedSkillLevel + 1;
+    return answer;
 }
