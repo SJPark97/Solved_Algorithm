@@ -1,53 +1,51 @@
 function solution(points, routes) {
-    const findShortestWay = (sR, sC, eR, eC) => {
+    const toKey = (r, c) => `${r}_${c}`;
+
+    const getPath = (start, end) => {
+        const [sr, sc] = start;
+        const [er, ec] = end;
         const path = [];
-        let r = sR;
-        let c = sC;
 
-        while (r !== eR) {
-            r += r < eR ? 1 : -1;
-            path.push(`${r}_${c}`);
+        let r = sr, c = sc;
+        while (r !== er) {
+            r += r < er ? 1 : -1;
+            path.push(toKey(r, c));
         }
-
-        while (c !== eC) {
-            c += c < eC ? 1 : -1;
-            path.push(`${r}_${c}`);
+        while (c !== ec) {
+            c += c < ec ? 1 : -1;
+            path.push(toKey(r, c));
         }
-
         return path;
     };
-    const robotRoutes = routes.map((route) => {
-        let robotLocation;
-        
-        return route.flatMap((point, idx) => {
-            if (idx === 0) {
-                const [r, c] = points[point - 1];
-                robotLocation = [r, c];
-                return [`${r}_${c}`];
-            } else {
-                const way = findShortestWay(...robotLocation, ...points[point - 1]);
-                robotLocation = [...points[point - 1]];
-                return way;
-            }
-        })
-    })
-    let answer = 0;
-    let time = 0;
-    const maxTime = Math.max(...robotRoutes.map((a) => a.length))
-    while (time < maxTime) {
-        const locationCounter = {};
-        for (const robotRoute of robotRoutes) {
-            if (robotRoute.length <= time) continue;
-            if (!locationCounter[robotRoute[time]]) {
-                locationCounter[robotRoute[time]] = 1;
-            } else {
-                if (locationCounter[robotRoute[time]] === 1) {
-                    answer += 1;
-                }
-                locationCounter[robotRoute[time]] += 1;
-            }
+
+    const robotRoutes = routes.map(route => {
+        const fullPath = [];
+        let cur = points[route[0] - 1];
+        fullPath.push(toKey(...cur));
+
+        for (let i = 1; i < route.length; i++) {
+            const next = points[route[i] - 1];
+            const path = getPath(cur, next);
+            fullPath.push(...path);
+            cur = next;
         }
-        time += 1;
+        return fullPath;
+    });
+
+    const maxTime = Math.max(...robotRoutes.map(r => r.length));
+    let answer = 0;
+
+    for (let t = 0; t < maxTime; t++) {
+        const count = new Map();
+        for (const route of robotRoutes) {
+            if (t >= route.length) continue;
+            const loc = route[t];
+            count.set(loc, (count.get(loc) || 0) + 1);
+        }
+        for (const c of count.values()) {
+            if (c > 1) answer += 1;
+        }
     }
+
     return answer;
 }
