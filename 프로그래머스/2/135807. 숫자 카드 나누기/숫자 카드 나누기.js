@@ -1,16 +1,14 @@
 function solution(arrayA, arrayB) {
-    const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-    const numberGroupGcd = (numbers) => numbers.reduce((acc, cur) => gcd(acc, cur));
-    const gcdA = numberGroupGcd(arrayA);
-    const gcdB = numberGroupGcd(arrayB);
-    const checkCanDivide = (gcd, numberArray) => {
-        for (const number of numberArray) {
-            if (number % gcd === 0) {
-                return 0;
-            }
-        }
-        return gcd;
+    const aResult = getAnswer(arrayA, arrayB)
+    const bResult = getAnswer(arrayB, arrayA)
+
+    return aResult > bResult ? aResult : bResult
+}
+
+function getAnswer (A, B) {
+    A.sort((a, b) => a - b)
+    for (let i = A[0]; i > 1; i--) {
+        if (A.every(a => a % i === 0) && !B.some(b => b % i === 0)) return i
     }
-    const answer = Math.max(checkCanDivide(gcdA, arrayB), checkCanDivide(gcdB, arrayA));
-    return answer;
+    return 0
 }
